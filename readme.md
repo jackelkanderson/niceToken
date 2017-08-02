@@ -13,6 +13,8 @@ This script relies on a few environment variables:
 * `$MFA_DEVICE` the Amazon ARN of your MFA device. Visible on the IAM page for your user.
 * `$MFA_ASSUME_ROLE` the Amazon ARN of the role you would like to assume. Visible on the IAM page for the role. 
 
+The script also relies on a configured AWS profile called `nice-identity-long-term`. Make sure this is in your credentials file. This is the profile your existing keys will go under.
+
 To run, just execute in a terminal session as such:
 `./niceToken.sh 123456` where 123456 is the MFA code given by your device. 
 
