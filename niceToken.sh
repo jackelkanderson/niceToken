@@ -1,31 +1,34 @@
 #!/usr/bin/env bash
 
+#needs:
+#TODO: move nice-identity-long-term to a variable.
+#note that AWS CLI uses AWS_DEFAULT_PROFILE while AWS SDK uses AWS_PROFILE
+
 
 #Get initial session token
 #$MFA_DEVICE is ARN of the MFA device.
 
-echo "getting long-term token..."
-aws sts get-session-token --serial-number $MFA_DEVICE --profile nice-identity-long-term --token-code $1 > ~/.aws/return.json
+LONG_TERM_PROFILE=$AWS_PROFILE"-long-term"
 
-aws configure set aws_access_key_id "$(jq -r .Credentials.AccessKeyId < ~/.aws/return.json)" --profile "orch-dev-long-term"
-aws configure set aws_secret_access_key "$(jq -r .Credentials.SecretAccessKey < ~/.aws/return.json)" --profile "orch-dev-long-term"
-aws configure set aws_session_token "$(jq -r .Credentials.SessionToken < ~/.aws/return.json)" --profile "orch-dev-long-term"
+echo "getting long-term token for $LONG_TERM_PROFILE..."
+aws sts get-session-token --serial-number $MFA_DEVICE --profile nice-identity-long-term --token-code $1 --query "Credentials" > ~/.aws/return.json
 
-#loop here someday
+aws configure set aws_access_key_id "$(jq -r .AccessKeyId < ~/.aws/return.json)" --profile $LONG_TERM_PROFILE
+aws configure set aws_secret_access_key "$(jq -r .SecretAccessKey < ~/.aws/return.json)" --profile $LONG_TERM_PROFILE
+aws configure set aws_session_token "$(jq -r .SessionToken < ~/.aws/return.json)" --profile $LONG_TERM_PROFILE
+
 #note assume-role ARN is an environment variable: MFA_ASSUME_ROLE
 
 COUNTER=0
-while [ $COUNTER -lt 2 ]; do
+while [ $COUNTER -lt 12 ]; do
     echo "renewing role token..."
+    aws sts assume-role --role-arn $MFA_ASSUME_ROLE --role-session-name jack-test --profile $LONG_TERM_PROFILE --duration-seconds 3600 --query "Credentials" > ~/.aws/short_term_creds.json 
 
-    #Can use --query "Credentials" to drill down into result json json
-    #Duration is 900 for test purposes
-    aws sts assume-role --role-arn $MFA_ASSUME_ROLE --role-session-name jack-test --profile "orch-dev-long-term" --duration-seconds 3600 > ~/.aws/short_term_creds.json 
-
-    aws configure set aws_access_key_id "$(jq -r .Credentials.AccessKeyId < ~/.aws/short_term_creds.json)" --profile "orch-dev"
-    aws configure set aws_secret_access_key "$(jq -r .Credentials.SecretAccessKey < ~/.aws/short_term_creds.json)" --profile "orch-dev"
-    aws configure set aws_session_token "$(jq -r .Credentials.SessionToken < ~/.aws/short_term_creds.json)" --profile "orch-dev"
+    echo "role token renewed, will expire at $(jq -r .Expiration < ~/.aws/short_term_creds.json)"
+    aws configure set aws_access_key_id "$(jq -r .AccessKeyId < ~/.aws/short_term_creds.json)" --profile $AWS_PROFILE
+    aws configure set aws_secret_access_key "$(jq -r .SecretAccessKey < ~/.aws/short_term_creds.json)" --profile $AWS_PROFILE
+    aws configure set aws_session_token "$(jq -r .SessionToken < ~/.aws/short_term_creds.json)" --profile $AWS_PROFILE
 
     COUNTER=$[$COUNTER + 1]
-    sleep 3600  
+    sleep 3540 #59 minutes  
 done
