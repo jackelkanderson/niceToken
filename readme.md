@@ -16,4 +16,4 @@ This script relies on a few environment variables:
 To run, just execute in a terminal session as such:
 `./niceToken.sh 123456` where 123456 is the MFA code given by your device. 
 
-Not that you can append & to the command to run it in the background. 
+Note that you can append & to the command to run it in the background. 
