@@ -18,6 +18,7 @@ aws configure set aws_secret_access_key "$(jq -r .SecretAccessKey < ~/.aws/retur
 aws configure set aws_session_token "$(jq -r .SessionToken < ~/.aws/return.json)" --profile $LONG_TERM_PROFILE
 
 #note assume-role ARN is an environment variable: MFA_ASSUME_ROLE
+#change role-session-name
 
 COUNTER=0
 while [ $COUNTER -lt 12 ]; do

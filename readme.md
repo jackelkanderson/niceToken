@@ -10,7 +10,9 @@ However, when getting a session token using MFA, that token is valid for 12 hour
 ### Dependencies:
 JQ is required. In windows make sure it is on the command line. The easiest way to do that is using choco.
 
-###
+AWS CLI is also required.
+
+### Setup:
 Place the shell script in a directory of choice and add to .bashrc if you so desire. 
 
 This script relies on a few environment variables:
