@@ -26,3 +26,9 @@ To run, just execute in a terminal session as such:
 `./niceToken.sh 123456` where 123456 is the MFA code given by your device. 
 
 Note that you can append & to the command to run it in the background. 
+
+### For Windows Users:
+
+There are a few gotcha's that may affect windows users.
+
+* Be cognizant of where your terminal places your home folder. Git Bash puts it in funny places, adapt the script as needed to update your credentials in the .aws folder. 
