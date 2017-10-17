@@ -32,3 +32,4 @@ Note that you can append & to the command to run it in the background.
 There are a few gotcha's that may affect windows users.
 
 * Be cognizant of where your terminal places your home folder. Git Bash puts it in funny places, adapt the script as needed to update your credentials in the .aws folder. 
+* Installations of JQ or AWS CLI may not place them in your path. Make sure they are accessible there.
